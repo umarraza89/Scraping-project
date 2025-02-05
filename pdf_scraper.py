@@ -6,17 +6,17 @@ from bs4 import BeautifulSoup
 
 BASE_URL = "https://papers.nips.cc/paper/"
 DOWNLOAD_DIR = "mydocuments"
-THREAD_POOL_SIZE = 30  # Adjust based on system capability
+THREAD_POOL_SIZE = 30  
 
 
 def create_download_dir():
-    """Create download directory if not exists."""
+    #Create download directory if not exists
     if not os.path.exists(DOWNLOAD_DIR):
         os.makedirs(DOWNLOAD_DIR)
 
 
 def get_paper_links(year):
-    """Scrapes paper links from the given year."""
+    #Scrapes paper links from the given year
     url = f"{BASE_URL}{year}"
     print(f"\nScraping year: {year}")
 
@@ -38,7 +38,7 @@ def get_paper_links(year):
 
 
 def download_paper(paper_title, paper_url, year):
-    """Processes and downloads the PDF of a paper."""
+    #Processes and downloads the PDF of a paper
     print(f"\nProcessing: {paper_title}")
 
     response = requests.get(paper_url)
@@ -78,14 +78,18 @@ def download_file(url, title, suffix):
 
 def main():
     create_download_dir()
-    year = 2021  # Adjust the year as needed
-    paper_links = get_paper_links(year)
+    years = [2019, 2020, 2021, 2022] 
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=THREAD_POOL_SIZE) as executor:
-        futures = [executor.submit(download_paper, title, url, year) for title, url, year in paper_links]
+        futures = []
+        for year in years:
+            paper_links = get_paper_links(year)
+            futures.extend(executor.submit(download_paper, title, url, year) for title, url, year in paper_links)
+
         concurrent.futures.wait(futures)
 
     print("\nAll downloads complete!")
+
 
 
 if __name__ == "__main__":
